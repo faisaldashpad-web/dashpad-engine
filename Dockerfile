@@ -1,15 +1,20 @@
-# Code-server ബേസ് ഇമേജ്
-FROM linuxserver/code-server:latest
+# Node.js ഇമേജ് ഉപയോഗിക്കുന്നു
+FROM node:18
 
-# ആവശ്യമായ ടൂളുകൾ ഇൻസ്റ്റാൾ ചെയ്യുന്നു
-RUN apt-get update && apt-get install -y curl git unzip xz-utils libglu1-mesa
+# ആപ്പ് ഫോൾഡർ ഉണ്ടാക്കുന്നു
+WORKDIR /usr/src/app
 
-# Flutter SDK ഇൻസ്റ്റാൾ ചെയ്യുന്നു
-RUN git clone https://github.com/flutter/flutter.git /opt/flutter
-ENV PATH="/opt/flutter/bin:${PATH}"
+# പാക്കേജ് ഫയലുകൾ കോപ്പി ചെയ്യുന്നു
+COPY package*.json ./
 
-# Flutter സെറ്റപ്പ് റൺ ചെയ്യുന്നു
-RUN flutter doctor
+# ആവശ്യമായ ലൈബ്രറികൾ ഇൻസ്റ്റാൾ ചെയ്യുന്നു
+RUN npm install
 
-# VS Code പോർട്ട് തുറക്കുന്നു
-EXPOSE 8443
+# എല്ലാ കോഡുകളും കോപ്പി ചെയ്യുന്നു
+COPY . .
+
+# സർവർ പ്രവർത്തിപ്പിക്കേണ്ട പോർട്ട്
+EXPOSE 8080
+
+# സർവർ സ്റ്റാർട്ട് ചെയ്യുന്നു
+CMD [ "node", "server.js" ]
